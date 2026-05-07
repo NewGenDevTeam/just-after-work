@@ -103,10 +103,11 @@ export interface WPTestimonial {
 
 async function wpFetch<T>(path: string, opts: RequestInit = {}): Promise<T> {
   const url = path.startsWith("http") ? path : `${WP_API}${path}`;
+  // 20 s covers Railway container cold-start (free tier can take 10–30 s)
   const res = await fetch(url, {
     ...opts,
     next: { revalidate: 60 },
-    signal: AbortSignal.timeout(5000),
+    signal: AbortSignal.timeout(20000),
   });
   if (!res.ok) throw new Error(`WP ${res.status}: ${url}`);
   return res.json();

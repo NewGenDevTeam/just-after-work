@@ -14,45 +14,51 @@ const FALLBACK_TESTIMONIALS: TestimonialItem[] = [
     name: "Diana Lecorne",
     role: "Mexican Embassy President",
     quote:
-      "JAW creates spaces where real conversations happen. It's where culture and ambition meet in the most natural way.",
+      "Just After Work is an inspiring platform where professionals and entrepreneurs connect and share ideas in genuine ways. My first event encouraged genuine networking — I met someone who motivated a personal project.",
   },
   {
     name: "Theeban G",
     role: "Actor, Fighter & Tech Entrepreneur",
     quote:
-      "The energy at every JAW event is unlike anything else in KL. You leave with connections that actually matter.",
+      "At Just After Work, there somehow is a very personal touch to the experience. It's amazing. I got connected with current developers through connections made at JAW.",
   },
   {
     name: "Darren Teh",
-    role: "Vocalist & Marketing Head",
+    role: "Vocalist, An Honest Mistake · Fred Perry MY Marketing Head",
     quote:
-      "Finally, an event where networking feels human. JAW gets that the best deals happen when the tie comes off.",
+      "I met a bunch of really cool people at JAW from entrepreneurs to musicians and media outlets. Meeting people otherwise impossible to encounter.",
+  },
+  {
+    name: "TC",
+    role: "Gig For Good",
+    quote:
+      "JAW and their team truly understands how to bring people together creating an environment where professionals can connect, share experiences, and build meaningful relationships.",
   },
   {
     name: "Sam Fakhouri",
     role: "Kingsmen Barbershop Owner",
     quote:
-      "Partnering with JAW was one of the best decisions we made. They attract the kind of crowd that understands quality.",
+      "JAW knows how to turn social gatherings into powerful networking experiences. The energy, organization, and attention to detail are memorable.",
   },
   {
     name: "Fuad Alhabshi",
-    role: "Kyoto Protocol Frontman & Halogen Capital",
+    role: "Kyoto Protocol Frontman · Halogen Capital Executive Director",
     quote:
-      "JAW blurs the line between the creative world and the business world in a way that feels totally effortless.",
+      "Just After Work is a rare gem in Malaysia's networking scene. Where professionals from diverse industries connect in settings completely free from corporate stiffness.",
   },
   {
     name: "Raja Izz",
     role: "GC Magazine",
     quote:
-      "Every issue we cover JAW, we walk away inspired. It's a community that genuinely moves the needle for KL's scene.",
+      "JAW brings together people who value authenticity and shared growth. JAW stands out for reminding us that the best connections are built on genuine friendship.",
   },
 ];
 
 const FALLBACK_NEWS: NewsItem[] = [
   {
-    title: "Padel & Connect at ASCARO",
-    excerpt: "Where networking meets sporting elegance.",
-    date: "Sep 15, 2025",
+    title: "Padel & Connect at ASCARO: Where networking meets sporting elegance",
+    excerpt: "Where networking meets sporting elegance — JAW takes networking to the court at ASCARO Padel & Social Club.",
+    date: "Jul 6, 2025",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/09/IMG_1099-890x664.webp",
     href: "https://gentlemanscodes.com/living/padel-connect-at-ascaro-where-networking-meets-sporting-elegance",
@@ -60,26 +66,26 @@ const FALLBACK_NEWS: NewsItem[] = [
   {
     title: "How 'The Gentleman's Hour' Gave Self-Care A Business Agenda",
     excerpt:
-      "JAW's debut at Kingsmen Barbershop turns wellness into a board meeting.",
+      "JAW's debut at Kingsmen Barbershop turns wellness into a board meeting — where grooming meets genuine connection.",
     date: "Sep 10, 2025",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/09/57a64395-ad9c-42e2-8896-20ff0d6c2ec8-890x664.jpg",
     href: "https://juiceonline.com/the-gentlemans-hour/",
   },
   {
-    title: "Sporty Networking With A Twist at ASCARO Padel & Social Club",
+    title: "JAW Serves Up Sporty Networking With A Twist At ASCARO Padel & Social Club",
     excerpt:
-      "JAW serves up the perfect after-work cocktail of sport and connection.",
+      "JAW serves up the perfect after-work cocktail of sport and connection at ASCARO Padel & Social Club.",
     date: "Sep 5, 2025",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/09/jk-890x664.jpg",
     href: "https://juiceonline.com/jaw-serves-up-sporty-networking-with-a-twist-at-ascaro-padel-social-club/",
   },
   {
-    title: "JAW Debuts at Kingsmen Barbershop",
+    title: "Just After Work debuts at Kingsmen Barbershop with 'The Gentleman's Hour'",
     excerpt:
-      "The Gentleman's Hour kicks off Kingsmen's anniversary in style.",
-    date: "Aug 22, 2025",
+      "JAW's debut event at Kingsmen Barbershop — 80 entrepreneurs, live jazz, and genuine connection.",
+    date: "Jun 23, 2025",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/09/new1-890x664.webp",
     href: "https://gentlemanscodes.com/grooming/the-gentleman-s-hour-just-after-work-s-debut-kingsmen-barbershop-damansara-heights-1st-anniversary-celebration",

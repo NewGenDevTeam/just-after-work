@@ -120,7 +120,7 @@ export default function ContactPage() {
               </p>
               <a
                 href="mailto:jude@justafterwork.com"
-                className="text-2xl font-display italic hover:text-gradient"
+                className="text-lg sm:text-2xl font-display italic hover:text-gradient break-all"
               >
                 jude@justafterwork.com
               </a>

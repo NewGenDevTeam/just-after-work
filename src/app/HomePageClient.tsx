@@ -28,18 +28,18 @@ export interface NewsItem {
 
 const roles = ["Creative", "Founder", "Connector", "Storyteller"];
 
-const NEXT_EVENT = "2026-10-31T19:00:00+08:00";
+const NEXT_EVENT = "2025-10-31T19:00:00+08:00";
 
 const events = [
   {
     id: 1,
-    title: "RSVP — The Women's Circle",
-    venue: "Kuala Lumpur · 19:00",
+    title: "RSVP – The Women's Circle",
+    venue: "Kuala Lumpur at 19:00",
     description:
-      "A private gathering for influential women to unwind and discuss meaningful topics beyond the nine-to-five.",
+      "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-26-at-15.20.26.jpeg",
-    rsvpUrl: "https://justafterwork.com/rsvp-the-womens-circle/",
+    rsvpUrl: "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
   },
 ];
 

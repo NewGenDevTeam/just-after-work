@@ -6,15 +6,15 @@ import { getEvents, type WPEvent } from "@/lib/wordpress";
 const FALLBACK_EVENTS: WPEvent[] = [
   {
     id: 1,
-    slug: "the-womens-circle",
-    title: "The Women's Circle",
-    date: "2026-06-15T19:00:00+08:00",
-    event_time: "19:00",
-    venue: "Kuala Lumpur",
+    slug: "rsvp-the-womens-circle",
+    title: "RSVP – The Women's Circle",
+    date: "2025-10-31",
+    event_time: "7:00 PM – 11:00 PM",
+    venue: "Noko Noko, Damansara Heights",
     description:
-      "Less stiff suits, more inspiring chats. A private gathering for influential women to unwind and talk about what really matters.",
-    rsvp_link: "https://justafterwork.com/rsvp-the-womens-circle/",
-    rsvpUrl: "https://justafterwork.com/rsvp-the-womens-circle/",
+      "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
+    rsvp_link: "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
+    rsvpUrl: "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
     event_status: "upcoming",
     image:
       "https://justafterwork.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-26-at-15.20.26.jpeg",
@@ -118,10 +118,10 @@ export default async function EventsPage() {
                       href={e.rsvpUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group relative inline-flex rounded-full mr-0 sm:mr-4"
+                      className="group relative inline-flex rounded-full self-start sm:self-center mr-0 sm:mr-4"
                     >
                       <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className="relative bg-text-primary text-bg rounded-full px-5 py-2.5 text-xs uppercase tracking-[0.2em]">
+                      <span className="relative bg-text-primary text-bg rounded-full px-5 py-3 text-xs uppercase tracking-[0.2em]">
                         RSVP
                       </span>
                     </Link>

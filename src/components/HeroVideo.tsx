@@ -19,6 +19,13 @@ export default function HeroVideo({
     const video = videoRef.current;
     if (!video) return;
 
+    // iOS/macOS Safari supports HLS natively — set src immediately so the
+    // browser never shows its native play-button overlay on an empty video.
+    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src;
+      return;
+    }
+
     let hls: { destroy: () => void } | null = null;
     (async () => {
       const HlsModule = (await import("hls.js")).default;
@@ -27,8 +34,6 @@ export default function HeroVideo({
         instance.loadSource(src);
         instance.attachMedia(video);
         hls = instance;
-      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = src;
       }
     })();
 

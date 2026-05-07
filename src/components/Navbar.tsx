@@ -28,6 +28,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,15 +44,23 @@ export default function Navbar() {
     else setQuery("");
   }, [searchOpen]);
 
-  // Close search on route change
-  useEffect(() => { setSearchOpen(false); }, [pathname]);
+  // Close search and mobile menu on route change
+  useEffect(() => { setSearchOpen(false); setMenuOpen(false); }, [pathname]);
 
-  // Close search on Escape
+  // Close on Escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setSearchOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setSearchOpen(false); setMenuOpen(false); }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   const results = query.trim().length > 0
     ? searchItems.filter((s) =>
@@ -126,16 +135,69 @@ export default function Navbar() {
 
           <div className="hidden lg:block w-px h-5 bg-stroke mx-1" />
 
-          {/* CTA */}
-          <Link href="/contact" className="group relative">
+          {/* CTA — desktop only */}
+          <Link href="/contact" className="hidden lg:inline-flex group relative">
             <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
             <span className="relative inline-flex items-center gap-1.5 bg-surface rounded-full backdrop-blur-md text-xs text-text-primary px-3 py-1.5 transition-all duration-200">
               Say hi
               <span className="text-[10px]">↗</span>
             </span>
           </Link>
+
+          {/* Hamburger — mobile only */}
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full text-muted hover:text-text-primary hover:bg-stroke/50 transition-all duration-200 ml-1"
+          >
+            {menuOpen ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 lg:hidden bg-bg/95 backdrop-blur-md flex flex-col pt-24 px-6 overflow-y-auto">
+          <nav className="flex flex-col">
+            {navLinks.map((link) => {
+              const active = isActive(link);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    "py-5 text-2xl font-display italic border-b border-stroke transition-colors",
+                    active ? "text-text-primary" : "text-muted hover:text-text-primary"
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="mt-8 pb-10">
+            <Link
+              href="/contact"
+              onClick={() => setMenuOpen(false)}
+              className="group relative inline-flex rounded-full"
+            >
+              <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative inline-flex items-center gap-1.5 bg-surface rounded-full backdrop-blur-md text-sm text-text-primary px-5 py-3 transition-all">
+                Say hi <span className="text-xs">↗</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Search overlay */}
       {searchOpen && (
