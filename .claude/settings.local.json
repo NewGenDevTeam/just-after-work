@@ -3,7 +3,10 @@
     "allow": [
       "WebFetch(domain:justafterwork.com)",
       "Bash(Get-Content \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\\\\src\\\\app\\\\page.tsx\")",
-      "Bash(Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\\\\.next\\\\standalone\\\\server.js\")"
+      "Bash(Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\\\\.next\\\\standalone\\\\server.js\")",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)"
     ]
   }
 }

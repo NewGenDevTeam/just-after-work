@@ -13,8 +13,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'justafterwork.com' },
       { protocol: 'https', hostname: '**.justafterwork.com' },
       { protocol: 'https', hostname: 'secure.gravatar.com' },
-      // Add your WordPress hostname here once deployed
-      // { protocol: 'https', hostname: 'cms.yourdomain.com' },
+      { protocol: 'https', hostname: 'docker-image-production-ed6e.up.railway.app' },
     ],
   },
 };
