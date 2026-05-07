@@ -54,16 +54,28 @@ async function wpGet(path) {
   return r.json();
 }
 
-/** Create or update a post. Returns the post object or null on error. */
-async function upsert(type, title, body) {
-  const list = await wpGet(
-    `/${type}?search=${encodeURIComponent(title)}&per_page=10&status=any`
-  );
-  const match = Array.isArray(list)
-    ? list.find(
-        (p) => (p.title?.rendered || "").toLowerCase() === title.toLowerCase()
-      )
-    : null;
+/** Create or update a post. Returns the post object or null on error.
+ *  slug (optional): look up by slug first — immune to dash/encoding variants. */
+async function upsert(type, title, body, slug = null) {
+  let match = null;
+
+  // 1. Slug-based lookup (precise, handles em-dash vs hyphen variants)
+  if (slug) {
+    const bySlug = await wpGet(`/${type}?slug=${encodeURIComponent(slug)}&per_page=5&status=any`);
+    match = Array.isArray(bySlug) && bySlug.length > 0 ? bySlug[0] : null;
+  }
+
+  // 2. Fall back to title search
+  if (!match) {
+    const list = await wpGet(
+      `/${type}?search=${encodeURIComponent(title)}&per_page=10&status=any`
+    );
+    match = Array.isArray(list)
+      ? list.find(
+          (p) => (p.title?.rendered || "").toLowerCase() === title.toLowerCase()
+        )
+      : null;
+  }
 
   const url    = match ? `${API}/${type}/${match.id}` : `${API}/${type}`;
   const action = match ? "↺ updated" : "+ created";
@@ -137,23 +149,24 @@ function fields(obj) {
 
 const EVENTS = [
   {
-    title: "RSVP – The Women's Circle",
-    content:
-      "Just After Work presents “The Women’s Circle”.\n\n" +
-      "We’re so excited to invite you to a special, women-only evening curated by Just After Work (JAW). This time, we are collaborating with Malaysia’s first financial planning platform for women, Uno Advisers, who will also be here to give insights into the importance of wealth management.\n\n" +
-      "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.\n\n" +
-      "Theme: Health. Wealth. Connection.\n\n" +
-      "When: Friday, 31st October 2025\nTime: 7:00 PM – 11:00 PM\nWhere: Noko Noko, Damansara Heights\n\n" +
-      "18-M, Plaza Damansara, Jalan Medan Setia 2, Bukit Damansara, 50490 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia\n\n" +
-      "Heads up: This is a private, limited-capacity event, so please RSVP as soon as you can.\n\n" +
-      "RSVP your spot by Oct 29.\n\n" +
-      "Contact us via WhatsApp +6017 249 3182 for any enquiries.",
+    title: "RSVP - The Women's Circle",
+    _slug:  "rsvp-the-womens-circle",   // used for slug-based upsert lookup
+    content: [
+      'Just After Work presents "The Women\'s Circle".',
+      'We\'re so excited to invite you to a special, women-only evening curated by Just After Work (JAW). Collaborating with Uno Advisers, Malaysia\'s first financial planning platform for women.',
+      'Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.',
+      'Theme: Health. Wealth. Connection.',
+      'When: Friday, 31st October 2025 | Time: 7:00 PM - 11:00 PM | Where: Noko Noko, Damansara Heights',
+      '18-M, Plaza Damansara, Jalan Medan Setia 2, Bukit Damansara, 50490 Kuala Lumpur.',
+      'Heads up: This is a private, limited-capacity event, so please RSVP as soon as you can.',
+      'RSVP your spot by Oct 29. Contact us via WhatsApp +6017 249 3182 for any enquiries.',
+    ].join('\n\n'),
     excerpt:
       "A private women-only gathering. Theme: Health. Wealth. Connection. Less stiff suits, more inspiring chats and genuine connections.",
     ...fields({
       event_date:        "20251031",
       event_time:        "7:00 PM – 11:00 PM",
-      venue:             "Noko Noko, Damansara Heights",
+      venue:             "Kuala Lumpur at 19:00",
       short_description:
         "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
       rsvp_link:         "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
@@ -349,10 +362,39 @@ async function seedWithImages(type, items) {
       ? await uploadImageFromUrl(p._imageUrl, p._imageFile)
       : null;
     const body = { ...p };
+    const slug = body._slug || null;
     delete body._imageUrl;
     delete body._imageFile;
+    delete body._slug;
     if (mediaId) body.featured_media = mediaId;
-    await upsert(type, p.title, body);
+    await upsert(type, p.title, body, slug);
+  }
+}
+
+/** Trash any events in WordPress whose slug/title is not in our EVENTS list. */
+async function cleanStaleEvents() {
+  const knownSlugs  = new Set(EVENTS.map((e) => e._slug).filter(Boolean));
+  const knownTitles = new Set(EVENTS.map((e) => e.title.toLowerCase()));
+
+  const all = await wpGet("/events?per_page=50&status=any");
+  if (!Array.isArray(all) || all.length === 0) return;
+
+  for (const e of all) {
+    const slug  = e.slug || "";
+    const title = (e.title?.rendered || "").toLowerCase();
+    if (knownSlugs.has(slug) || knownTitles.has(title)) continue;
+
+    console.log(`  🗑  Trashing stale event "${e.title?.rendered}" (id: ${e.id})`);
+    const r = await fetch(`${API}/events/${e.id}`, {
+      method: "DELETE",
+      headers: JSON_HEADERS,
+    });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      console.log(`    ✗ Delete failed: HTTP ${r.status}`, JSON.stringify(d).slice(0, 200));
+    } else {
+      console.log("    ✓ Moved to trash");
+    }
   }
 }
 
@@ -360,6 +402,7 @@ async function seed() {
   console.log(`\n🌱  Seeding WordPress at ${BASE}\n`);
 
   console.log("── Events ────────────────────────────────────────────");
+  await cleanStaleEvents();
   await seedWithImages("events", EVENTS);
 
   console.log("\n── News & Media ──────────────────────────────────────");
