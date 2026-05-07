@@ -37,8 +37,11 @@ export const revalidate = 60;
 export default async function FoundersPage() {
   const wpFounders = await getFounders();
 
+  // Only use WP data when at least one founder has real ACF content
+  const hasContent = wpFounders.some((f) => f.role || f.short_bio || f.image);
+
   const founders: FounderItem[] =
-    wpFounders.length > 0
+    hasContent
       ? wpFounders.map((f) => {
           const socials: { label: string; href: string }[] = [];
           if (f.linkedin_link) socials.push({ label: "LinkedIn", href: f.linkedin_link });
@@ -51,7 +54,7 @@ export default async function FoundersPage() {
             socials,
           };
         })
-      : FALLBACK_FOUNDERS;
+      : FALLBACK_FOUNDERS; // fallback until ACF fields are filled in WP
 
   return <FoundersClient founders={founders} />;
 }

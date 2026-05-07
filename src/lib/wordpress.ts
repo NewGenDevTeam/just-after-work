@@ -117,7 +117,17 @@ export function stripHtml(html: string): string {
 }
 
 function getMeta(raw: WPRaw, key: string): unknown {
-  return raw.meta?.[key] ?? raw.acf?.[key];
+  // ACF data lives in `acf` field; `meta` is a secondary fallback
+  const acf = raw.acf as Record<string, unknown> | undefined;
+  return acf?.[key] ?? raw.meta?.[key];
+}
+
+// ACF date picker saves as YYYYMMDD — normalise to YYYY-MM-DD for JS Date
+function normalizeDate(raw: string, fallback: string): string {
+  if (!raw) return fallback;
+  if (/^\d{8}$/.test(raw))
+    return `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  return raw;
 }
 
 function metaStr(raw: WPRaw, key: string, fallback = ""): string {
@@ -195,7 +205,7 @@ export async function getEvents(): Promise<WPEvent[]> {
         id: p.id,
         slug: p.slug,
         title: stripHtml(p.title.rendered),
-        date: metaStr(p, "event_date", p.date),
+        date: normalizeDate(metaStr(p, "event_date"), p.date),
         event_time: metaStr(p, "event_time"),
         venue: metaStr(p, "venue", "TBA"),
         description:

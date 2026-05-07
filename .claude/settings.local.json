@@ -6,7 +6,8 @@
       "Bash(Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\\\\.next\\\\standalone\\\\server.js\")",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "WebFetch(domain:docker-image-production-ed6e.up.railway.app)"
     ]
   }
 }

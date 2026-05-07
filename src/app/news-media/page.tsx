@@ -69,7 +69,10 @@ export default async function NewsPage() {
     getVideos(),
   ]);
 
-  const posts = wpPosts.length > 0 ? wpPosts : FALLBACK_POSTS;
+  // Only use WP data when at least one item has real ACF content
+  const hasRealNews = wpPosts.some((p) => p.short_description || p.external_link || p.image);
+  const posts = hasRealNews ? wpPosts : FALLBACK_POSTS;
+  // Videos are already filtered by extractYouTubeId; wpVideos=[] when youtube_url is missing
   const videos = wpVideos.length > 0 ? wpVideos : FALLBACK_VIDEOS;
 
   return (

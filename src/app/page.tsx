@@ -94,25 +94,26 @@ export default async function HomePage() {
     getNewsMedia(),
   ]);
 
-  const testimonials: TestimonialItem[] =
-    wpTestimonials.length > 0
-      ? wpTestimonials.map((t) => ({
-          name: t.person_name,
-          role: t.person_role,
-          quote: t.quote,
-        }))
-      : FALLBACK_TESTIMONIALS;
+  // Only use WP data when at least one item has real ACF content
+  const hasRealTestimonials = wpTestimonials.some((t) => t.quote);
+  const testimonials: TestimonialItem[] = hasRealTestimonials
+    ? wpTestimonials.map((t) => ({
+        name: t.person_name,
+        role: t.person_role,
+        quote: t.quote,
+      }))
+    : FALLBACK_TESTIMONIALS;
 
-  const news: NewsItem[] =
-    wpNews.length > 0
-      ? wpNews.slice(0, 4).map((n) => ({
-          title: n.title,
-          excerpt: n.short_description,
-          date: formatDate(n.publish_date),
-          image: n.image,
-          href: n.external_link || `/news-media/${n.slug}`,
-        }))
-      : FALLBACK_NEWS;
+  const hasRealNews = wpNews.some((n) => n.short_description || n.external_link);
+  const news: NewsItem[] = hasRealNews
+    ? wpNews.slice(0, 4).map((n) => ({
+        title: n.title,
+        excerpt: n.short_description,
+        date: formatDate(n.publish_date),
+        image: n.image,
+        href: n.external_link || `/news-media/${n.slug}`,
+      }))
+    : FALLBACK_NEWS;
 
   return <HomePageClient testimonials={testimonials} news={news} />;
 }
