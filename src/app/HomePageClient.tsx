@@ -28,12 +28,10 @@ export interface NewsItem {
 
 const roles = ["Creative", "Founder", "Connector", "Storyteller"];
 
-const NEXT_EVENT = "2025-10-31T19:00:00+08:00";
-
 const events = [
   {
     id: 1,
-    title: "RSVP – The Women's Circle",
+    title: "RSVP - The Women's Circle",
     venue: "Kuala Lumpur at 19:00",
     description:
       "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
@@ -221,9 +219,11 @@ function Carousel({
 export default function HomePageClient({
   testimonials,
   news,
+  nextEventTarget,
 }: {
   testimonials: TestimonialItem[];
   news: NewsItem[];
+  nextEventTarget: string | null;
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [roleIndex, setRoleIndex] = useState(0);
@@ -306,7 +306,13 @@ export default function HomePageClient({
           </p>
 
           <div className="blur-in flex justify-center mb-12">
-            <Countdown target={NEXT_EVENT} />
+            {nextEventTarget ? (
+              <Countdown target={nextEventTarget} />
+            ) : (
+              <p className="text-xs text-muted uppercase tracking-[0.3em]">
+                Event Ended — Check back soon
+              </p>
+            )}
           </div>
 
           <div className="blur-in inline-flex flex-wrap items-center justify-center gap-4">
@@ -425,7 +431,7 @@ export default function HomePageClient({
                   >
                     <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span className="relative bg-text-primary text-bg rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] hover:scale-105 transition-transform">
-                      RSVP Now
+                      Register Now
                     </span>
                   </a>
                   <Link

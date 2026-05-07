@@ -7,10 +7,10 @@ const FALLBACK_EVENTS: WPEvent[] = [
   {
     id: 1,
     slug: "rsvp-the-womens-circle",
-    title: "RSVP – The Women's Circle",
+    title: "RSVP - The Women's Circle",
     date: "2025-10-31",
-    event_time: "7:00 PM – 11:00 PM",
-    venue: "Noko Noko, Damansara Heights",
+    event_time: "7:00 PM - 11:00 PM",
+    venue: "Kuala Lumpur at 19:00",
     description:
       "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
     rsvp_link: "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
@@ -25,9 +25,12 @@ export const revalidate = 60;
 
 export default async function EventsPage() {
   const wpEvents = await getEvents();
-  const events = wpEvents.length > 0 ? wpEvents : FALLBACK_EVENTS;
+  // Deduplicate by slug (belt-and-suspenders in case WP still has duplicates)
+  const seen = new Set<string>();
+  const deduped = wpEvents.filter((e) => !seen.has(e.slug) && !!seen.add(e.slug));
+  const events = deduped.length > 0 ? deduped : FALLBACK_EVENTS;
   const next = events[0];
-  const venueDisplay = [next.venue, next.event_time].filter(Boolean).join(" · ");
+  const venueDisplay = next.venue;
 
   return (
     <div className="pt-32 md:pt-40 pb-16">
@@ -56,7 +59,23 @@ export default async function EventsPage() {
             <h3 className="text-3xl md:text-5xl font-display italic mb-3">
               {next.title}
             </h3>
-            <p className="text-sm text-muted mb-8">{venueDisplay}</p>
+            <p className="text-sm text-muted mb-6">{venueDisplay}</p>
+            <p className="text-sm text-muted mb-8 max-w-md leading-relaxed">
+              {next.description}
+            </p>
+            <div className="flex flex-wrap gap-3 mb-8">
+              <a
+                href={next.rsvpUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex rounded-full"
+              >
+                <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative bg-text-primary text-bg rounded-full px-6 py-3 text-sm uppercase tracking-[0.2em] hover:scale-105 transition-transform">
+                  Register Now
+                </span>
+              </a>
+            </div>
             <Countdown target={next.date} />
           </div>
           <div className="md:col-span-7 relative aspect-[4/3] rounded-2xl overflow-hidden border border-stroke">
@@ -83,7 +102,6 @@ export default async function EventsPage() {
           ) : (
             <div className="space-y-5">
               {events.map((e) => {
-                const vd = [e.venue, e.event_time].filter(Boolean).join(" · ");
                 return (
                   <div
                     key={e.id}
@@ -109,7 +127,7 @@ export default async function EventsPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted">{vd}</p>
+                      <p className="text-sm text-muted">{e.venue}</p>
                       <p className="text-sm text-muted mt-2 line-clamp-2 max-w-2xl">
                         {e.description}
                       </p>
@@ -122,7 +140,7 @@ export default async function EventsPage() {
                     >
                       <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
                       <span className="relative bg-text-primary text-bg rounded-full px-5 py-3 text-xs uppercase tracking-[0.2em]">
-                        RSVP
+                        Register Now
                       </span>
                     </Link>
                   </div>

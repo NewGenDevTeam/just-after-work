@@ -1,4 +1,4 @@
-import { getTestimonials, getNewsMedia } from "@/lib/wordpress";
+import { getTestimonials, getNewsMedia, getEvents } from "@/lib/wordpress";
 import HomePageClient, {
   type TestimonialItem,
   type NewsItem,
@@ -94,10 +94,24 @@ const FALLBACK_NEWS: NewsItem[] = [
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+function buildEventTarget(date: string, eventTime: string): string {
+  // date: YYYY-MM-DD; eventTime: "7:00 PM – 11:00 PM" (use start)
+  const startRaw = eventTime.split(/[–\-]/)[0].trim();
+  const m = startRaw.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!m) return `${date}T19:00:00+08:00`;
+  let h = parseInt(m[1], 10);
+  const min = m[2];
+  const ap = m[3].toUpperCase();
+  if (ap === "PM" && h !== 12) h += 12;
+  if (ap === "AM" && h === 12) h = 0;
+  return `${date}T${String(h).padStart(2, "0")}:${min}:00+08:00`;
+}
+
 export default async function HomePage() {
-  const [wpTestimonials, wpNews] = await Promise.all([
+  const [wpTestimonials, wpNews, wpEvents] = await Promise.all([
     getTestimonials(),
     getNewsMedia(),
+    getEvents(),
   ]);
 
   // Only use WP data when at least one item has real ACF content
@@ -121,5 +135,17 @@ export default async function HomePage() {
       }))
     : FALLBACK_NEWS;
 
-  return <HomePageClient testimonials={testimonials} news={news} />;
+  const today = new Date().toISOString().slice(0, 10);
+  const nextEvent = wpEvents.find((e) => e.date >= today);
+  const nextEventTarget = nextEvent
+    ? buildEventTarget(nextEvent.date, nextEvent.event_time)
+    : null;
+
+  return (
+    <HomePageClient
+      testimonials={testimonials}
+      news={news}
+      nextEventTarget={nextEventTarget}
+    />
+  );
 }

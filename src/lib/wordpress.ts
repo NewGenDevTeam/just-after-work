@@ -113,8 +113,28 @@ async function wpFetch<T>(path: string, opts: RequestInit = {}): Promise<T> {
   return res.json();
 }
 
+function decodeHtmlEntities(str: string): string {
+  if (!str) return str;
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#8216;/g, "‘")
+    .replace(/&#8217;/g, "'")
+    .replace(/&#8220;/g, "“")
+    .replace(/&#8221;/g, "”")
+    .replace(/&#8211;/g, "-")
+    .replace(/&#8212;/g, "-")
+    .replace(/&#8230;/g, "...")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&[a-zA-Z][a-zA-Z0-9]*;/g, "");
+}
+
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, "").trim();
+  return decodeHtmlEntities(html.replace(/<[^>]+>/g, "")).trim();
 }
 
 function getMeta(raw: WPRaw, key: string): unknown {
@@ -200,22 +220,33 @@ export async function getPostBySlug(slug: string): Promise<WPPost | null> {
 export async function getEvents(): Promise<WPEvent[]> {
   try {
     const raw = await wpFetch<WPRaw[]>("/events?per_page=20&_embed=true");
-    return raw.map((p) => {
+    const mapped = raw.map((p) => {
       const rsvp = metaStr(p, "rsvp_link");
       return {
         id: p.id,
         slug: p.slug,
         title: stripHtml(p.title.rendered),
         date: normalizeDate(metaStr(p, "event_date"), p.date),
-        event_time: metaStr(p, "event_time"),
-        venue: metaStr(p, "venue", "TBA"),
-        description:
-          metaStr(p, "short_description") || stripHtml(p.excerpt.rendered),
+        event_time: decodeHtmlEntities(metaStr(p, "event_time")),
+        venue: decodeHtmlEntities(metaStr(p, "venue", "TBA")),
+        description: decodeHtmlEntities(
+          metaStr(p, "short_description") || stripHtml(p.excerpt.rendered)
+        ),
         rsvp_link: rsvp,
         rsvpUrl: rsvp || "#",
         event_status: metaStr(p, "event_status", "upcoming"),
         image: featuredImage(p),
       };
+    });
+    // Deduplicate by slug, then by normalised title (catches slug-variant dupes like -2)
+    const seenSlugs = new Set<string>();
+    const seenTitles = new Set<string>();
+    return mapped.filter((e) => {
+      const titleKey = e.title.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (seenSlugs.has(e.slug) || seenTitles.has(titleKey)) return false;
+      seenSlugs.add(e.slug);
+      seenTitles.add(titleKey);
+      return true;
     });
   } catch (e) {
     console.error("[WP] getEvents:", e);
