@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:justafterwork.com)",
+      "Bash(Get-Content \"c:\\\\Users\\\\hp\\\\Desktop\\\\project folder\\\\just-after-work\\\\just-after-work\\\\src\\\\app\\\\page.tsx\")"
+    ]
+  }
+}
