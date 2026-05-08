@@ -19,11 +19,14 @@ export default function HeroVideo({
     const video = videoRef.current;
     if (!video) return;
 
-    // iOS/macOS Safari supports HLS natively — set src immediately so the
-    // browser never shows its native play-button overlay on an empty video.
+    const tryPlay = () => { video.play().catch(() => {}); };
+
+    // iOS/macOS Safari supports HLS natively.
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      return;
+      video.load();
+      video.addEventListener("loadedmetadata", tryPlay, { once: true });
+      return () => video.removeEventListener("loadedmetadata", tryPlay);
     }
 
     let hls: { destroy: () => void } | null = null;
@@ -38,6 +41,7 @@ export default function HeroVideo({
     })();
 
     return () => {
+      video.removeEventListener("loadedmetadata", tryPlay);
       hls?.destroy();
     };
   }, [src]);
@@ -50,6 +54,8 @@ export default function HeroVideo({
         muted
         loop
         playsInline
+        preload="auto"
+        style={{ pointerEvents: "none" }}
         className={`absolute top-1/2 left-1/2 min-w-full min-h-full object-cover -translate-x-1/2 -translate-y-1/2 ${
           flip ? "scale-y-[-1]" : ""
         }`}

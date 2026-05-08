@@ -69,7 +69,6 @@
   }
 }
 
-/* keep in sync with the prompt's animation block */
 @keyframes scroll-down {
   0% {
     transform: translateY(-100%);
