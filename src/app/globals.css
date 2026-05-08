@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Suppress native video controls where the browser honours these selectors.
+   iOS 15+ ignores shadow-DOM selectors from external CSS; HeroVideo handles
+   that case by not rendering any video element on mobile at all. */
+video::-webkit-media-controls,
+video::-webkit-media-controls-panel,
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+video {
+  pointer-events: none;
+}
+
+/* ── Mobile hero: CSS-only animated background ──────────────────────────────
+   Rendered on screens below the md breakpoint (< 768 px) in place of the
+   HLS video, which iOS Safari cannot autoplay without showing a play icon.
+   Uses the Mux thumbnail (same frame the desktop video opens on) and applies
+   a slow infinite drift to mimic the feeling of a moving background. */
+.mobile-hero-bg {
+  background-image: url("https://image.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g/thumbnail.jpg");
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  animation: mobile-hero-drift 18s ease-in-out infinite alternate;
+}
+
+@keyframes mobile-hero-drift {
+  0% {
+    transform: scale(1.08) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.15) translate3d(-2%, -1.5%, 0);
+  }
+}
+
 @layer base {
   :root {
     --bg: 0 0% 4%;
