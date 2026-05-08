@@ -8,8 +8,10 @@ interface HeroVideoProps {
   overlay?: string;
 }
 
+const PLAYBACK_ID = "Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g";
+
 export default function HeroVideo({
-  src = "https://stream.mux.com/Aa02T7oM1wH5Mk5EEVDYhbZ1ChcdhRsS2m1NYyx4Ua1g.m3u8",
+  src = `https://stream.mux.com/${PLAYBACK_ID}.m3u8`,
   flip = false,
   overlay = "bg-black/20",
 }: HeroVideoProps) {
@@ -19,31 +21,21 @@ export default function HeroVideo({
     const video = videoRef.current;
     if (!video) return;
 
-    // Force muted via JS property — some mobile browsers ignore the HTML attribute.
+    // Force muted via JS property — iOS Safari can ignore the HTML attribute.
     video.muted = true;
     (video as HTMLVideoElement & { defaultMuted: boolean }).defaultMuted = true;
 
-    // canplay fires when the browser has enough data to begin playing.
-    // loadedmetadata fires too early on iOS Safari and play() gets rejected.
-    const tryPlay = () => {
-      const promise = video.play();
-      if (promise !== undefined) {
-        promise.catch(() => {
-          // If play() is still rejected, retry once on the next canplay.
-          video.addEventListener("canplay", () => { video.play().catch(() => {}); }, { once: true });
-        });
-      }
-    };
-
-    // iOS/macOS Safari supports HLS natively.
+    // canPlayType("application/vnd.apple.mpegurl") returns non-empty ONLY on Safari/WebKit.
+    // On iOS 17+, Hls.isSupported() also returns true (Apple added MSE), but native HLS
+    // is far more reliable for autoplay on iOS — so we check this FIRST.
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
-      video.load();
-      video.addEventListener("canplay", tryPlay, { once: true });
-      return () => video.removeEventListener("canplay", tryPlay);
+      // autoPlay attribute does not re-fire when src is set via JS; call play() explicitly.
+      video.play().catch(() => {});
+      return;
     }
 
-    // All other browsers: use hls.js.
+    // Chrome, Firefox, Edge: use hls.js.
     let hls: { destroy: () => void } | null = null;
     (async () => {
       const HlsModule = (await import("hls.js")).default;
@@ -51,16 +43,16 @@ export default function HeroVideo({
         const instance = new HlsModule();
         instance.loadSource(src);
         instance.attachMedia(video);
-        // autoplay attribute alone is unreliable on mobile Chrome; call play() explicitly.
-        video.addEventListener("canplay", tryPlay, { once: true });
+        video.addEventListener(
+          "canplay",
+          () => { video.play().catch(() => {}); },
+          { once: true }
+        );
         hls = instance;
       }
     })();
 
-    return () => {
-      video.removeEventListener("canplay", tryPlay);
-      hls?.destroy();
-    };
+    return () => { hls?.destroy(); };
   }, [src]);
 
   return (
@@ -72,6 +64,8 @@ export default function HeroVideo({
         loop
         playsInline
         preload="auto"
+        // poster suppresses the native browser play-button overlay while the stream loads
+        poster={`https://image.mux.com/${PLAYBACK_ID}/thumbnail.jpg`}
         style={{ pointerEvents: "none" }}
         className={`absolute top-1/2 left-1/2 min-w-full min-h-full object-cover -translate-x-1/2 -translate-y-1/2 ${
           flip ? "scale-y-[-1]" : ""
