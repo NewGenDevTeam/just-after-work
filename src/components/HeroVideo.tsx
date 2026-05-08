@@ -19,16 +19,31 @@ export default function HeroVideo({
     const video = videoRef.current;
     if (!video) return;
 
-    const tryPlay = () => { video.play().catch(() => {}); };
+    // Force muted via JS property — some mobile browsers ignore the HTML attribute.
+    video.muted = true;
+    (video as HTMLVideoElement & { defaultMuted: boolean }).defaultMuted = true;
+
+    // canplay fires when the browser has enough data to begin playing.
+    // loadedmetadata fires too early on iOS Safari and play() gets rejected.
+    const tryPlay = () => {
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise.catch(() => {
+          // If play() is still rejected, retry once on the next canplay.
+          video.addEventListener("canplay", () => { video.play().catch(() => {}); }, { once: true });
+        });
+      }
+    };
 
     // iOS/macOS Safari supports HLS natively.
     if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src;
       video.load();
-      video.addEventListener("loadedmetadata", tryPlay, { once: true });
-      return () => video.removeEventListener("loadedmetadata", tryPlay);
+      video.addEventListener("canplay", tryPlay, { once: true });
+      return () => video.removeEventListener("canplay", tryPlay);
     }
 
+    // All other browsers: use hls.js.
     let hls: { destroy: () => void } | null = null;
     (async () => {
       const HlsModule = (await import("hls.js")).default;
@@ -36,12 +51,14 @@ export default function HeroVideo({
         const instance = new HlsModule();
         instance.loadSource(src);
         instance.attachMedia(video);
+        // autoplay attribute alone is unreliable on mobile Chrome; call play() explicitly.
+        video.addEventListener("canplay", tryPlay, { once: true });
         hls = instance;
       }
     })();
 
     return () => {
-      video.removeEventListener("loadedmetadata", tryPlay);
+      video.removeEventListener("canplay", tryPlay);
       hls?.destroy();
     };
   }, [src]);
