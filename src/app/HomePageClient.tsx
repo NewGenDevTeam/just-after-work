@@ -281,10 +281,7 @@ export default function HomePageClient({
         <HeroVideo />
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center pt-32 pb-24">
-          <p className="blur-in text-xs text-muted uppercase tracking-[0.3em] mb-8">
-            COLLECTION &lsquo;26
-          </p>
-
+          
           <div className="name-reveal mb-6 inline-block text-left">
             <Logo variant="hero" />
           </div>

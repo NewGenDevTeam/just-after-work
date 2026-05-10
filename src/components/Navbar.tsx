@@ -135,15 +135,6 @@ export default function Navbar() {
 
           <div className="hidden lg:block w-px h-5 bg-stroke mx-1" />
 
-          {/* CTA — desktop only */}
-          <Link href="/contact" className="hidden lg:inline-flex group relative">
-            <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="relative inline-flex items-center gap-1.5 bg-surface rounded-full backdrop-blur-md text-xs text-text-primary px-3 py-1.5 transition-all duration-200">
-              Say hi
-              <span className="text-[10px]">↗</span>
-            </span>
-          </Link>
-
           {/* Hamburger — mobile only */}
           <button
             onClick={() => setMenuOpen((o) => !o)}
@@ -184,18 +175,7 @@ export default function Navbar() {
               );
             })}
           </nav>
-          <div className="mt-8 pb-10">
-            <Link
-              href="/contact"
-              onClick={() => setMenuOpen(false)}
-              className="group relative inline-flex rounded-full"
-            >
-              <span className="absolute -inset-[2px] rounded-full accent-gradient-animated opacity-0 group-hover:opacity-100 transition-opacity" />
-              <span className="relative inline-flex items-center gap-1.5 bg-surface rounded-full backdrop-blur-md text-sm text-text-primary px-5 py-3 transition-all">
-                Say hi <span className="text-xs">↗</span>
-              </span>
-            </Link>
-          </div>
+
         </div>
       )}
 

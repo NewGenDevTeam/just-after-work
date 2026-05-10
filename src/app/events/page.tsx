@@ -23,6 +23,31 @@ const FALLBACK_EVENTS: WPEvent[] = [
 
 export const revalidate = 60;
 
+function buildEventTarget(date?: string | null, time?: string | null) {
+  if (!date) return "";
+
+  if (date.includes("T")) return date;
+
+  const startTime = time?.split("–")[0]?.split("-")[0]?.trim() || "00:00";
+
+  const match = startTime.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+
+  if (!match) {
+    return `${date}T00:00:00+08:00`;
+  }
+
+  let hour = Number(match[1]);
+  const minute = match[2] || "00";
+  const period = match[3]?.toUpperCase();
+
+  if (period === "PM" && hour !== 12) hour += 12;
+  if (period === "AM" && hour === 12) hour = 0;
+
+  const finalHour = String(hour).padStart(2, "0");
+
+  return `${date}T${finalHour}:${minute}:00+08:00`;
+}
+
 export default async function EventsPage() {
   const wpEvents = await getEvents();
   // Deduplicate by slug (belt-and-suspenders in case WP still has duplicates)
@@ -76,7 +101,7 @@ export default async function EventsPage() {
                 </span>
               </a>
             </div>
-            <Countdown target={next.date} />
+            <Countdown target={buildEventTarget(next.date, next.event_time)} />
           </div>
           <div className="md:col-span-7 relative aspect-[4/3] rounded-2xl overflow-hidden border border-stroke">
             {next.image && (
