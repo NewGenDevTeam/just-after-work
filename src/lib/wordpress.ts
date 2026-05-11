@@ -263,7 +263,7 @@ export async function getNewsMedia(): Promise<WPNewsMedia[]> {
       id: p.id,
       slug: p.slug,
       title: stripHtml(p.title.rendered),
-      publish_date: metaStr(p, "publish_date", p.date),
+      publish_date: normalizeDate(metaStr(p, "publish_date"), p.date),
       short_description:
         metaStr(p, "short_description") || stripHtml(p.excerpt.rendered),
       category_label: metaStr(p, "category_label"),
