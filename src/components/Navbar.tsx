@@ -84,9 +84,8 @@ export default function Navbar() {
           )}
         >
           {/* Logo */}
-          <a href="/" className="group relative w-12 h-10 shrink-0">
-            <span className="absolute inset-0 rounded-full accent-gradient-animated" />
-            <span className="absolute inset-[2px] rounded-full bg-bg flex items-center justify-center transition-transform group-hover:scale-110">
+          <a href="/" className="group relative w-20 h-14 shrink-0 flex items-center justify-center">
+            <span className="flex items-center justify-center transition-transform group-hover:scale-105">
               <Logo variant="nav" />
             </span>
           </a>

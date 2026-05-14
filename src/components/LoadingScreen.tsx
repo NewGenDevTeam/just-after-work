@@ -51,9 +51,11 @@ export default function LoadingScreen({
         transition={{ duration: 0.5 }}
         className="p-6 md:p-10"
       >
-        <span className="text-xs text-muted uppercase tracking-[0.3em]">
-          Just After Work
-        </span>
+        <img
+          src="/jaw-logo.png"
+          alt="Just After Work"
+          className="h-24 w-auto object-contain"
+        />
       </motion.div>
 
       {/* Center rotating words */}
