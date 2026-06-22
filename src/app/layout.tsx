@@ -31,6 +31,14 @@ export const metadata: Metadata = {
   title: "Just After Work — When Work Ends, The Real Game Begins",
   description:
     "JAW is the meeting point for professionals who thrive beyond the 9-to-5. Stylish venues, crafted cocktails, and curated networking.",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/favicon.ico",
+  },
   openGraph: {
     title: "Just After Work",
     description: "Unwind. Connect. Enjoy — Just After Work.",
