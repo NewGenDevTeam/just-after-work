@@ -8,19 +8,17 @@ const audience = [
   {
     title: "Professionals Who Think Big",
     desc: "Bold conversations and disruptive ideas that move beyond boardrooms into real impact.",
-    image:
-      "https://justafterwork.com/wp-content/uploads/2025/10/professionals-who-think-big-1024x769.webp",
+    image: "/images/jaw-event-1.jpg",
   },
   {
     title: "Creatives & Storytellers",
     desc: "Designers, makers, and visionaries who thrive on inspiration and collaboration.",
-    image: "https://justafterwork.com/wp-content/uploads/2025/09/ss1-1024x769.webp",
+    image: "/images/jaw-event-3.jpg",
   },
   {
     title: "Founders & Doers",
     desc: "Entrepreneurs and strategists turning ideas into action and partnerships into growth.",
-    image:
-      "https://justafterwork.com/wp-content/uploads/2025/10/founders-doers-1024x769.webp",
+    image: "/images/jaw-gathering.jpeg",
   },
 ];
 

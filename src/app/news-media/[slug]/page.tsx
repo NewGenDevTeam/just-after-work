@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPostBySlug, stripHtml } from "@/lib/wordpress";
+import { getNewsMediaBySlug } from "@/lib/wordpress";
+import { getStaticNewsMediaBySlug } from "@/lib/newsMediaData";
 import { formatDate } from "@/lib/utils";
 
 export const revalidate = 60;
@@ -10,53 +11,59 @@ export default async function NewsDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const post = await getPostBySlug(params.slug);
-  if (!post) notFound();
+  const post =
+    (await getNewsMediaBySlug(params.slug)) ??
+    getStaticNewsMediaBySlug(params.slug);
 
-  const image = post._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
-  const author = post._embedded?.author?.[0]?.name;
+  if (!post) notFound();
 
   return (
     <article className="pt-32 md:pt-40 pb-16">
       <div className="max-w-[800px] mx-auto px-6 md:px-10">
         <Link
-          href="/news"
+          href="/news-media"
           className="text-xs text-muted uppercase tracking-[0.3em] hover:text-text-primary transition-colors"
         >
-          ← Back to news
+          ← Back to News &amp; Media
         </Link>
 
-        <header className="mt-8 mb-12">
+        <header className="mt-8 mb-10">
           <p className="text-xs text-muted uppercase tracking-[0.3em] mb-4">
-            {formatDate(post.date)}
-            {author && <> · {author}</>}
+            {post.category_label
+              ? `${post.category_label} · ${formatDate(post.publish_date)}`
+              : formatDate(post.publish_date)}
           </p>
-          <h1
-            className="text-4xl md:text-6xl font-display italic leading-[1.05]"
-            dangerouslySetInnerHTML={{ __html: post.title.rendered }}
-          />
+          <h1 className="text-4xl md:text-5xl font-display italic leading-[1.1]">
+            {post.title}
+          </h1>
         </header>
 
-        {image && (
-          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border border-stroke mb-12">
+        {post.image && (
+          <div className="relative aspect-[16/9] rounded-3xl overflow-hidden border border-stroke mb-10">
             <img
-              src={image}
-              alt={stripHtml(post.title.rendered)}
+              src={post.image}
+              alt={post.title}
               className="absolute inset-0 w-full h-full object-cover"
             />
           </div>
         )}
 
-        <div
-          className="prose prose-invert max-w-none
-            prose-headings:font-display prose-headings:italic
-            prose-p:text-muted prose-p:leading-relaxed
-            prose-a:text-text-primary prose-a:no-underline hover:prose-a:underline
-            prose-img:rounded-2xl prose-img:border prose-img:border-stroke
-            prose-blockquote:border-l-2 prose-blockquote:border-text-primary/40
-            prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-text-primary"
-          dangerouslySetInnerHTML={{ __html: post.content.rendered }}
-        />
+        {post.short_description && (
+          <p className="text-lg text-muted leading-relaxed mb-10">
+            {post.short_description}
+          </p>
+        )}
+
+        {post.external_link && (
+          <a
+            href={post.external_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 border border-stroke rounded-full px-6 py-3 text-sm text-text-primary hover:bg-stroke/40 transition-colors"
+          >
+            Read Full Article ↗
+          </a>
+        )}
       </div>
     </article>
   );

@@ -256,6 +256,29 @@ export async function getEvents(): Promise<WPEvent[]> {
 
 // ─── News & Media ─────────────────────────────────────────────────────────────
 
+export async function getNewsMediaBySlug(slug: string): Promise<WPNewsMedia | null> {
+  const qs = new URLSearchParams({ slug, _embed: "true" });
+  try {
+    const raw = await wpFetch<WPRaw[]>(`/news_media?${qs}`);
+    if (!raw[0]) return null;
+    const p = raw[0];
+    return {
+      id: p.id,
+      slug: p.slug,
+      title: stripHtml(p.title.rendered),
+      publish_date: normalizeDate(metaStr(p, "publish_date"), p.date),
+      short_description:
+        metaStr(p, "short_description") || stripHtml(p.excerpt.rendered),
+      category_label: metaStr(p, "category_label"),
+      external_link: metaStr(p, "external_link"),
+      image: featuredImage(p),
+    };
+  } catch (e) {
+    console.error("[WP] getNewsMediaBySlug:", e);
+    return null;
+  }
+}
+
 export async function getNewsMedia(): Promise<WPNewsMedia[]> {
   try {
     const raw = await wpFetch<WPRaw[]>("/news_media?per_page=20&_embed=true");

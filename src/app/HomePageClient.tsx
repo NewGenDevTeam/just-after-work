@@ -35,8 +35,7 @@ const events = [
     venue: "Kuala Lumpur at 19:00",
     description:
       "Think less stiff suit, more inspiring chats, genuine connections and good vibes. This private event is designed for influential women like yourself to unwind and talk about what really matters.",
-    image:
-      "https://justafterwork.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-26-at-15.20.26.jpeg",
+    image: "/images/jaw-gathering.jpeg",
     rsvpUrl: "https://docs.google.com/forms/d/e/1FAIpQLSco2nqRX_9OWr_2v8RhGj4Ik0S93DTzGAdO-skZJZP4jWnOJw/viewform?usp=send_form",
   },
 ];
@@ -45,8 +44,7 @@ const founders = [
   {
     name: "Jarrod Solomon",
     role: "Founder",
-    image:
-      "https://justafterwork.com/wp-content/uploads/2024/05/jarrod-570x696.png",
+    image: "/images/founder-jarrod.png",
     bio: "Media tactician and strategy whisperer with 15+ years across FMT News and Sledgehammer Communications. Helps brands scale without selling out — connecting clarity with impact.",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/jarrod-solomon" },
@@ -56,8 +54,7 @@ const founders = [
   {
     name: "Jude Ashvin",
     role: "Co-Founder",
-    image:
-      "https://justafterwork.com/wp-content/uploads/2024/05/jude-570x696.jpg",
+    image: "/images/founder-jude.jpg",
     bio: "Once front and center of Malaysia's live music scene with Rhythm Nation. Turned passion into purpose — decoding the business behind the beat and building Keep It Local Asia.",
     socials: [
       { label: "LinkedIn", href: "https://www.linkedin.com/in/jude-ashvin-034a48147" },
@@ -371,11 +368,15 @@ export default function HomePageClient({
               </Link>
             </div>
             <div className="md:col-span-6 relative aspect-[4/5] rounded-3xl overflow-hidden border border-stroke">
-              <img
-                src="https://justafterwork.com/wp-content/uploads/2025/09/IMG_5515-1-1024x769.jpg"
-                alt="JAW gathering"
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
                 className="absolute inset-0 w-full h-full object-cover"
-              />
+              >
+                <source src="/video/about-jaw-video.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>

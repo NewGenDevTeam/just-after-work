@@ -10,17 +10,31 @@ export default function ContactPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("sending");
     const fd = new FormData(e.currentTarget);
+    const values = Object.fromEntries(fd) as Record<string, string>;
+
+    // Client-side validation
+    if (!values.name?.trim() || !values.email?.trim() || !values.message?.trim()) {
+      return;
+    }
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim());
+    if (!emailOk) return;
+
+    const form = e.currentTarget;
+    setStatus("sending");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        body: JSON.stringify(Object.fromEntries(fd)),
+        body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
-      if (!res.ok) throw new Error();
-      setStatus("sent");
-      (e.currentTarget as HTMLFormElement).reset();
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatus("sent");
+        form.reset();
+      } else {
+        setStatus("error");
+      }
     } catch {
       setStatus("error");
     }
@@ -105,9 +119,15 @@ export default function ContactPage() {
               </span>
             </button>
 
+            {status === "sent" && (
+              <p className="text-sm text-green-400">
+                Thank you. Your message has been sent successfully.
+              </p>
+            )}
+
             {status === "error" && (
               <p className="text-xs text-red-400">
-                Something went wrong. Try again or email us directly.
+                Something went wrong. Please try again or email us directly.
               </p>
             )}
           </form>
