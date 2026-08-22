@@ -137,9 +137,14 @@ export default async function HomePage() {
 
   const today = new Date().toISOString().slice(0, 10);
   const nextEvent = wpEvents.find((e) => e.date >= today);
+  // Original launch countdown target (initial build); shown only while
+  // WordPress has no upcoming event and this date is still in the future.
+  const FALLBACK_EVENT_TARGET = "2026-10-31T19:00:00+08:00";
   const nextEventTarget = nextEvent
     ? buildEventTarget(nextEvent.date, nextEvent.event_time)
-    : null;
+    : new Date(FALLBACK_EVENT_TARGET).getTime() > Date.now()
+      ? FALLBACK_EVENT_TARGET
+      : null;
 
   return (
     <HomePageClient

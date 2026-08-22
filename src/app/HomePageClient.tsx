@@ -225,7 +225,13 @@ export default function HomePageClient({
   const [isLoading, setIsLoading] = useState(true);
   const [roleIndex, setRoleIndex] = useState(0);
   const heroRef = useRef<HTMLDivElement>(null);
+  const introTl = useRef<{ play: () => void } | null>(null);
+  const overlayGone = useRef(false);
   const handleLoadingComplete = useCallback(() => setIsLoading(false), []);
+  const handleOverlayExited = useCallback(() => {
+    overlayGone.current = true;
+    introTl.current?.play();
+  }, []);
 
   useEffect(() => {
     const id = setInterval(
@@ -241,7 +247,15 @@ export default function HomePageClient({
     (async () => {
       const { gsap } = await import("gsap");
       ctx = gsap.context(() => {
-        const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+        // Paused + immediateRender: the fromTo start states hide the hero
+        // while the LoadingScreen overlay is still covering it; playback only
+        // starts from onExitComplete, once the overlay has fully faded out.
+        // Starting the timeline on the isLoading flip races the 0.5s exit
+        // fade and the entrance plays invisibly behind the overlay.
+        const tl = gsap.timeline({
+          paused: true,
+          defaults: { ease: "power3.out" },
+        });
         tl.fromTo(
           ".name-reveal",
           { opacity: 0, y: 50 },
@@ -256,16 +270,22 @@ export default function HomePageClient({
             duration: 1,
             stagger: 0.1,
             delay: -0.6,
+            immediateRender: true,
           }
         );
+        introTl.current = tl;
+        if (overlayGone.current) tl.play();
       }, heroRef);
     })();
-    return () => ctx?.revert();
+    return () => {
+      introTl.current = null;
+      ctx?.revert();
+    };
   }, [isLoading]);
 
   return (
     <>
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={handleOverlayExited}>
         {isLoading && <LoadingScreen onComplete={handleLoadingComplete} />}
       </AnimatePresence>
 

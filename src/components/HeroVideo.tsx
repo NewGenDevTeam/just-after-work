@@ -39,27 +39,31 @@ export default function HeroVideo({
 
     const attemptPlay = () => { video.play().catch(() => {}); };
 
-    // Safari / WebKit — native HLS.
-    if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = src;
-      attemptPlay();
-      return;
-    }
-
-    // Chrome / Firefox / Edge — hls.js.
+    // hls.js must be preferred wherever MSE is available: newer Chrome
+    // answers "maybe" to the native-HLS canPlayType probe but then fails
+    // this stream with MEDIA_ERR_SRC_NOT_SUPPORTED. Native HLS is only for
+    // browsers hls.js cannot drive (iOS Safari / WebKit without MSE).
     let hls: { destroy: () => void } | null = null;
+    let cancelled = false;
     (async () => {
       const HlsModule = (await import("hls.js")).default;
+      if (cancelled) return;
       if (HlsModule.isSupported()) {
         const instance = new HlsModule();
         instance.loadSource(src);
         instance.attachMedia(video);
         video.addEventListener("canplay", attemptPlay, { once: true });
         hls = instance;
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = src;
+        attemptPlay();
       }
     })();
 
-    return () => { hls?.destroy(); };
+    return () => {
+      cancelled = true;
+      hls?.destroy();
+    };
   }, [src]);
 
   // Desktop-only cover fallback: remove after 5 s even if onPlaying never fires.
